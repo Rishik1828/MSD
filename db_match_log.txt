@@ -1,0 +1,26 @@
+Database setup run
+Imported from CSV: 240 songs
+Imported from files: 250 songs
+Matched: 321 / 490 songs
+
+Matched songs sample:
+  Butta Bomma - Armaan Malik -> songs/happy/Telugu/Butta_Bomma_Telugu_happy_song.mp3
+  Samajavaragamana - Sid Sriram -> songs/happy/Telugu/Samajavaragamana_Ala_Vaikunthapurramloo_Telugu.mp3
+  Seeti Maar - Jaspreet Jasz -> songs/energetic/Hindi/Seeti_Maar_Radhe_Hindi_energetic.mp3
+  Inkem Inkem Inkem Kaavaale - Sid Sriram -> songs/happy/Telugu/Inkem_Inkem_Inkem_Kaavaale_Telugu.mp3
+  Priyathama Priyathama - Chinmayi -> songs/calm/Telugu/Priyathama_Priyathama_Telugu_calm.mp3
+  Butta Bomma - Armaan Malik -> songs/happy/Telugu/Butta_Bomma_Telugu_happy_song.mp3
+  Samajavaragamana - Sid Sriram -> songs/happy/Telugu/Samajavaragamana_Ala_Vaikunthapurramloo_Telugu.mp3
+  Seeti Maar - Jaspreet Jasz -> songs/energetic/Hindi/Seeti_Maar_Radhe_Hindi_energetic.mp3
+  Inkem Inkem Inkem Kaavaale - Sid Sriram -> songs/happy/Telugu/Inkem_Inkem_Inkem_Kaavaale_Telugu.mp3
+  Priyathama Priyathama - Chinmayi -> songs/calm/Telugu/Priyathama_Priyathama_Telugu_calm.mp3
+  Butta Bomma - Armaan Malik -> songs/happy/Telugu/Butta_Bomma_Telugu_happy_song.mp3
+  Samajavaragamana - Sid Sriram -> songs/happy/Telugu/Samajavaragamana_Ala_Vaikunthapurramloo_Telugu.mp3
+  Seeti Maar - Jaspreet Jasz -> songs/energetic/Hindi/Seeti_Maar_Radhe_Hindi_energetic.mp3
+  Inkem Inkem Inkem Kaavaale - Sid Sriram -> songs/happy/Telugu/Inkem_Inkem_Inkem_Kaavaale_Telugu.mp3
+  Inkem Inkem Inkem Kaavaale - Sid Sriram -> songs/happy/Telugu/Inkem_Inkem_Inkem_Kaavaale_Telugu.mp3
+  Naatu Naatu - Rahul Sipligunj -> songs/energetic/Telugu/Naatu_Naatu_RRR_Telugu_energetic.mp3
+  Badtameez Dil - Benny Dayal -> songs/happy/Hindi/Badtameez_Dil_Yeh_Jawaani_Hai.mp3
+  Gallan Goodiyaan - Yashita Sharma -> songs/happy/Hindi/Gallan_Goodiyaan_Dil_Dhadakne_Do.mp3
+  Kar Gayi Chull - Badshah -> songs/happy/Hindi/Kar_Gayi_Chull_Kapoor_and.mp3
+  Tum Hi Ho - Arijit Singh -> songs/sad/Hindi/Tum_Hi_Ho_Aashiqui_2.mp3

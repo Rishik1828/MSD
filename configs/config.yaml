@@ -1,0 +1,71 @@
+# ────────────────────────────────────────────────────────────────────────────────
+# Emotion Detector Configuration
+# ────────────────────────────────────────────────────────────────────────────────
+
+# Dataset paths (relative to project root OR absolute)
+data:
+  root: "YOLO_format"
+  train_images: "YOLO_format/train/images"
+  train_labels: "YOLO_format/train/labels"
+  val_images:   "YOLO_format/valid/images"
+  val_labels:   "YOLO_format/valid/labels"
+  test_images:  "YOLO_format/test/images"
+  test_labels:  "YOLO_format/test/labels"
+
+  num_classes: 8
+  class_names:
+    - "Anger"
+    - "Contempt"
+    - "Disgust"
+    - "Fear"
+    - "Happy"
+    - "Neutral"
+    - "Sad"
+    - "Surprise"
+
+# Model
+model:
+  backbone: "efficientnet_b2"   # timm model name
+  pretrained: true              # Use ImageNet pretrained weights
+  dropout_rate: 0.3             # Dropout before final classifier
+  hidden_dim: 512               # Intermediate FC layer size
+
+# Training
+training:
+  seed: 42
+  img_size: 224                 # Input image size (H x W)
+  batch_size: 32                # Reduce to 32 if GPU OOM
+  num_epochs: 50
+  num_workers: 2                # Windows safe (set 0 if DataLoader errors)
+
+  # Optimizer
+  optimizer: "adamw"
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+
+  # Learning rate scheduler
+  scheduler: "cosine"           # cosine annealing
+  eta_min: 1.0e-6               # Minimum LR at end of schedule
+
+  # Loss
+  label_smoothing: 0.1          # Smooths overconfident predictions
+  use_class_weights: true       # Weighted loss for imbalanced dataset
+
+  # Mixed precision (FP16) — ~2x speedup on CUDA
+  use_amp: true
+
+  # Gradient clipping
+  grad_clip_norm: 1.0
+
+  # Training phases
+  freeze_backbone_epochs: 5     # Freeze backbone for first N epochs (warmup)
+
+  # Early stopping
+  early_stopping_patience: 7    # Stop if val loss doesn't improve for N epochs
+
+# Checkpointing & Logging
+output:
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
+  best_model_name: "best_emotion_model.pth"
+  save_every_n_epochs: 5        # Also save periodic checkpoints

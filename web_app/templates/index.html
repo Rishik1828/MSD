@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MUSICBEATS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}?v=1.0.2"/>
+</head>
+<body>
+<div id="app" class="app">
+
+  <!-- ══ SCREEN 1 — HOME ═══════════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen screen--home active">
+    <div class="home-bg-glow" aria-hidden="true"></div>
+    <div class="home-center">
+      <div class="home-icon" aria-hidden="true">
+        <svg viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="40" fill="rgba(94,74,227,0.15)"/>
+          <path d="M30 52c0 3.314-2.686 6-6 6s-6-2.686-6-6 2.686-6 6-6c1.09 0 2.11.29 3 .8V24l28-7v10l-22 5.5V52c0 3.314-2.686 6-6 6s-6-2.686-6-6z" fill="#5E4AE3"/>
+        </svg>
+      </div>
+      <h1 class="home-title">MUSIC<span>BEATS</span></h1>
+      <p class="home-tagline">Your face knows what you need to hear.</p>
+      <button id="startBtn" class="btn-start" type="button">
+        <span>START</span>
+        <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+          <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/>
+        </svg>
+      </button>
+      <p class="home-hint">Model ready — instant start</p>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2 — SCAN ═══════════════════════════════════════════════════ -->
+  <div id="screen-scan" class="screen screen--scan">
+    <button class="back-btn" id="scanBackBtn" type="button" aria-label="Back">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/></svg>
+    </button>
+
+    <!-- Camera: live video OR frozen snapshot (toggled by JS) -->
+    <div class="scan-camera-wrap">
+      <video id="scanVideo" autoplay playsinline muted></video>
+      <canvas id="snapDisplay" aria-hidden="true"></canvas><!-- frozen frame shown after capture -->
+      <canvas id="scanCanvas"  aria-hidden="true"></canvas><!-- face-box overlay -->
+
+      <div class="scan-top-label" id="scanTopLabel">
+        <span class="scan-live-dot"></span>Position your face in the frame
+      </div>
+    </div>
+
+    <!-- Always-visible bottom panel — shows one state at a time -->
+    <div class="scan-bottom">
+      <div class="scan-bottom__pill" aria-hidden="true"></div>
+
+      <!-- STATE: idle — show capture button -->
+      <div id="scanStateIdle" class="scan-state">
+        <button class="btn-capture" id="captureBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+            <path stroke-linecap="round" d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          Capture My Mood
+        </button>
+        <p class="scan-hint-text">Make sure your face is clearly visible</p>
+      </div>
+
+      <!-- STATE: loading -->
+      <div id="scanStateLoading" class="scan-state" style="display:none">
+        <div class="capture-loading">
+          <div class="capture-spinner"></div>
+          <span>Analyzing your expression…</span>
+        </div>
+      </div>
+
+      <!-- STATE: result -->
+      <div id="scanStateResult" class="scan-state" style="display:none">
+        <div class="scan-result-row">
+          <span class="scan-emoji" id="scanEmoji" aria-hidden="true"></span>
+          <div>
+            <div class="scan-emotion" id="scanEmotion"></div>
+            <div class="scan-conf"   id="scanConf"></div>
+          </div>
+        </div>
+        <div class="scan-actions">
+          <button class="btn-retry" id="retryBtn" type="button">↩ Try Again</button>
+          <button class="btn-continue" id="continueBtn" type="button">Find My Music →</button>
+        </div>
+      </div>
+
+      <!-- STATE: error (no face found) -->
+      <div id="scanStateError" class="scan-state" style="display:none">
+        <div class="scan-result-row">
+          <span class="scan-emoji" aria-hidden="true">😕</span>
+          <div>
+            <div class="scan-emotion" style="color:#EF4444">No face detected</div>
+            <div class="scan-conf"   id="scanErrorMsg">Move closer or improve lighting</div>
+          </div>
+        </div>
+        <button class="btn-capture" id="retryBtn2" type="button">Try Again</button>
+      </div>
+
+    </div><!-- /scan-bottom -->
+  </div>
+
+  <!-- ══ SCREEN 3 — PREFERENCES ════════════════════════════════════════════ -->
+  <div id="screen-prefs" class="screen screen--prefs">
+    <button class="back-btn back-btn--light" id="prefsBackBtn" type="button" aria-label="Back">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/></svg>
+    </button>
+
+    <div class="prefs-scroll">
+      <div class="prefs-mood-badge">
+        <span class="prefs-mood-emoji" id="prefsMoodEmoji"></span>
+        <div>
+          <div class="prefs-mood-label" id="prefsMoodLabel"></div>
+          <div class="prefs-mood-sub">Mood detected · customize your sound</div>
+        </div>
+      </div>
+
+      <!-- Language -->
+      <div class="pref-group">
+        <div class="pref-group-label">Language</div>
+        <div class="pill-row" id="langPills">
+          <button class="pill active" data-value="" type="button">All</button>
+          <button class="pill" data-value="Telugu" type="button">Telugu</button>
+          <button class="pill" data-value="Hindi"  type="button">Hindi</button>
+          <button class="pill" data-value="English" type="button">English</button>
+        </div>
+      </div>
+
+      <!-- Era -->
+      <div class="pref-group">
+        <div class="pref-group-label">Era</div>
+        <div class="pill-row" id="eraPills">
+          <button class="pill active" data-value="" type="button">All</button>
+          <button class="pill" data-value="new" type="button">New</button>
+          <button class="pill" data-value="old" type="button">Classic</button>
+        </div>
+      </div>
+
+      <!-- Genre — pills loaded dynamically from /api/filters -->
+      <div class="pref-group">
+        <div class="pref-group-label">Genre</div>
+        <div class="pill-row pill-row--wrap" id="genrePills">
+          <button class="pill active" data-value="" type="button">All</button>
+          <!-- populated by JS from /api/filters -->
+        </div>
+      </div>
+
+      <button id="findSongsBtn" class="btn-find" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="17" height="17">
+          <path stroke-linecap="round" d="M9 19V6l12-3v13M9 19c0 1.1-1.34 2-3 2s-3-.9-3-2 1.34-2 3-2 3 .9 3 2zm12-3c0 1.1-1.34 2-3 2s-3-.9-3-2 1.34-2 3-2 3 .9 3 2z"/>
+        </svg>
+        Find My Songs
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4 — SONGS ══════════════════════════════════════════════════ -->
+  <div id="screen-songs" class="screen screen--songs">
+
+    <header class="songs-header">
+      <button class="back-btn-sm" id="songsBackBtn" type="button" aria-label="Back">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/></svg>
+      </button>
+      <div class="songs-header-mood">
+        <span id="songsHeaderEmoji"></span>
+        <span id="songsHeaderLabel"></span>
+      </div>
+      <span class="songs-count" id="songsCount"></span>
+    </header>
+
+    <!-- Song list — horizontal rows, not cards -->
+    <div class="song-list" id="songList" role="list"></div>
+
+    <!-- ── Now-Playing Strip ─────────────────────────────────────────────── -->
+    <div class="now-playing" id="nowPlaying">
+
+      <div class="np-left">
+        <div class="np-art" id="npArt">♪</div>
+        <div class="np-info">
+          <div class="np-title"  id="npTitle">No track selected</div>
+          <div class="np-artist" id="npArtist">Pick a song above to play</div>
+        </div>
+        <div class="equalizer paused" id="equalizer">
+          <div class="eq-bar"></div><div class="eq-bar"></div>
+          <div class="eq-bar"></div><div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+        </div>
+      </div>
+
+      <div class="np-center">
+        <div class="np-controls">
+          <button class="np-btn" id="npPrev" aria-label="Previous">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="17"><polygon points="19,20 9,12 19,4"/><rect x="5" y="4" width="3" height="16"/></svg>
+          </button>
+          <button class="np-btn np-btn--play" id="npPlayPause" aria-label="Play/Pause">
+            <svg id="iconPlay"  viewBox="0 0 24 24" fill="currentColor" width="20"><polygon points="5,3 19,12 5,21"/></svg>
+            <svg id="iconPause" viewBox="0 0 24 24" fill="currentColor" width="20" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          </button>
+          <button class="np-btn" id="npNext" aria-label="Next">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="17"><polygon points="5,4 15,12 5,20"/><rect x="16" y="4" width="3" height="16"/></svg>
+          </button>
+          <button class="np-btn np-btn--stop" id="npStop" aria-label="Stop">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="15"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+          </button>
+        </div>
+        <div class="np-seek-row">
+          <span class="np-time" id="npCurTime">0:00</span>
+          <input type="range" class="np-seek" id="npSeek" min="0" max="100" value="0" aria-label="Seek"/>
+          <span class="np-time" id="npDuration">0:00</span>
+        </div>
+      </div>
+
+      <div class="np-right">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" opacity=".5">
+          <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+          <path d="M15.54 8.46a5 5 0 010 7.07" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <input type="range" class="np-vol" id="npVol" min="0" max="100" value="85" aria-label="Volume"/>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<audio id="audioEl" preload="none" aria-hidden="true"></audio>
+<script src="{{ url_for('static', filename='js/app.js') }}?v=1.0.2"></script>
+</body>
+</html>

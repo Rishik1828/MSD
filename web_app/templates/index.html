@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MUSICBEATS</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}?v=1.0.2"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}?v=1.0.4"/>
 </head>
 <body>
 <div id="app" class="app">
@@ -52,16 +52,12 @@
     <div class="scan-bottom">
       <div class="scan-bottom__pill" aria-hidden="true"></div>
 
-      <!-- STATE: idle — show capture button -->
+      <!-- STATE: idle — auto-scanning -->
       <div id="scanStateIdle" class="scan-state">
-        <button class="btn-capture" id="captureBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-            <path stroke-linecap="round" d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-            <circle cx="12" cy="13" r="4"/>
-          </svg>
-          Capture My Mood
-        </button>
-        <p class="scan-hint-text">Make sure your face is clearly visible</p>
+        <div class="capture-loading">
+          <div class="capture-spinner" style="border-top-color: #8B7AEE"></div>
+          <span>Align your face to scan automatically...</span>
+        </div>
       </div>
 
       <!-- STATE: loading -->
@@ -226,6 +222,6 @@
 </div><!-- /app -->
 
 <audio id="audioEl" preload="none" aria-hidden="true"></audio>
-<script src="{{ url_for('static', filename='js/app.js') }}?v=1.0.2"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v=1.0.6"></script>
 </body>
 </html>

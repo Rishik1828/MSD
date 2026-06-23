@@ -137,6 +137,7 @@ const Scan = (() => {
 
   let detecting     = false;
   let transitioning = false;
+  let autoTimer     = null;
 
   function showState(state) {
     stateIdle.style.display    = state === "idle"    ? "block" : "none";
@@ -148,6 +149,7 @@ const Scan = (() => {
   function start(cameraOk = true) {
     transitioning = false;
     detecting = false;
+    if (autoTimer) clearTimeout(autoTimer);
     
     // Reset preview states
     snapDisplay.style.display = "none";
@@ -158,14 +160,22 @@ const Scan = (() => {
       return;
     }
     
-    // Show idle state
+    // Show idle state (contains auto-scan loading animation)
     showState("idle");
-    topLabel.innerHTML = `<span class="scan-live-dot"></span>Position your face in the frame`;
+    topLabel.innerHTML = `<span class="scan-live-dot"></span>Preparing camera...`;
+
+    // Wait 1.5s for camera to auto-expose, then trigger auto-capture
+    autoTimer = setTimeout(() => {
+      if (!transitioning && !detecting) {
+        capture();
+      }
+    }, 1500);
   }
 
   function stop() {
     transitioning = false;
     detecting = false;
+    if (autoTimer) clearTimeout(autoTimer);
     clearBox();
     snapDisplay.style.display = "none";
   }
@@ -176,7 +186,7 @@ const Scan = (() => {
 
     // Show loading state
     showState("loading");
-    topLabel.innerHTML = `<span class="scan-live-dot"></span>Analyzing frame…`;
+    topLabel.innerHTML = `<span class="scan-live-dot" style="background:#8B7AEE"></span>Analyzing frame…`;
 
     // Freeze frame by drawing video to snapDisplay
     if (video.readyState >= 2) {
@@ -203,21 +213,12 @@ const Scan = (() => {
       const data = await res.json();
 
       if (data.emotion && data.face_box) {
-        // Draw the face box overlay
-        drawBox(data.face_box);
-        
-        // Show result state
-        const meta = EMOTION_META[data.emotion] || { emoji: "🎭", label: data.emotion };
-        const pct  = Math.round(data.confidence * 100);
-        emojiEl.textContent   = meta.emoji;
-        emotionEl.textContent = meta.label;
-        confEl.textContent    = `${pct}% confidence`;
-        
+        // Save emotion to State
         State.emotion = data.emotion;
         State.emotionTag = data.emotion_tag;
         
-        showState("result");
-        topLabel.innerHTML = `<span class="scan-live-dot" style="background:#22C55E"></span>${meta.label} detected`;
+        // Directly move to the next page (Prefs/Categories)
+        proceed();
       } else {
         showError(data.message || "Move closer or improve lighting.");
       }
@@ -230,6 +231,7 @@ const Scan = (() => {
   }
 
   async function retry() {
+    if (autoTimer) clearTimeout(autoTimer);
     const errTitle = document.querySelector("#scanStateError .scan-emotion");
     if (errTitle && errTitle.textContent === "Camera Access Denied") {
       const ok = await Webcam.start();
@@ -243,10 +245,18 @@ const Scan = (() => {
       }
       return;
     }
+    
+    // Reset to live camera and trigger auto-capture again
     snapDisplay.style.display = "none";
     clearBox();
     showState("idle");
-    topLabel.innerHTML = `<span class="scan-live-dot"></span>Position your face in the frame`;
+    topLabel.innerHTML = `<span class="scan-live-dot"></span>Preparing camera...`;
+    
+    autoTimer = setTimeout(() => {
+      if (!transitioning && !detecting) {
+        capture();
+      }
+    }, 1500);
   }
 
   function proceed() {
@@ -641,7 +651,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Scan interaction buttons
-  document.getElementById("captureBtn").addEventListener("click", () => Scan.capture());
   document.getElementById("retryBtn").addEventListener("click", () => Scan.retry());
   document.getElementById("retryBtn2").addEventListener("click", () => Scan.retry());
   document.getElementById("continueBtn").addEventListener("click", () => Scan.proceed());
